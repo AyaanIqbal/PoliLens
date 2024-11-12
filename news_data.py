@@ -2,7 +2,6 @@ import requests
 import pandas as pd
 from datetime import datetime, timedelta
 
-API_KEY = '6834e2208e8f4986bda0d9ed757ae475'
 BASE_URL = 'https://newsapi.org/v2/everything'
 
 def fetch_general_news_data(query, from_date, to_date):
