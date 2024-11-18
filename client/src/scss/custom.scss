@@ -1,0 +1,83 @@
+/* Import Bootstrap SCSS */
+@import 'bootstrap/scss/bootstrap';
+
+$primary: #202427;
+$body-bg: #000;
+$body-color: #111;
+
+body {
+    background-color: $body-bg;
+}
+
+.btn-primary {
+    position: relative;
+    display: inline-block;
+    border-radius: 1.25rem; // 20px converted to rem
+    padding: 0.625rem 1.25rem; // 10px and 20px converted to rem
+    background: transparent;
+    border: 0.063rem solid #fff; // 1px converted to rem
+    color: #fff;
+    font-size: 1rem; // Base font size (16px)
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background-color: #fff;
+        color: #000;
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0.313rem rgba(255, 255, 255, 0.6); // 5px converted to rem
+    }
+}
+
+.bg-body-primary {
+    background-color: $primary;
+    height: 15vh; // Height based on viewport height for better responsiveness
+}
+
+.custom-navbar {
+    background-color: $primary;
+    padding: 1.25rem; // 20px converted to rem
+
+    .navbar-brand {
+        color: #fff;
+        font-size: 1.5rem; // 24px converted to rem
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+
+        .logo-icon {
+            margin-right: 0.625rem; // 10px converted to rem
+            font-size: 1.25rem; // 20px converted to rem
+        }
+
+        &:hover {
+            color: #ccc;
+        }
+    }
+
+    .nav-link {
+        color: #ccc;
+        font-size: 1.125rem; // 18px converted to rem
+        font-weight: 500;
+        margin-right: 1.25rem; // 20px converted to rem
+        transition: color 0.3s ease;
+
+        &:hover {
+            color: #fff;
+        }
+    }
+
+    .navbar-toggler {
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .navbar-collapse {
+        justify-content: flex-end;
+    }
+}
