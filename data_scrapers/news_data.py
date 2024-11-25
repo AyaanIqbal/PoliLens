@@ -66,30 +66,30 @@ def fetch_recent_bills(congress_number, limit=250):
         print(f"Error: {response.status_code}")
         return pd.DataFrame()
     
+# Fetches cosponsors for each bill and stores them in a separate DataFrame
 def fetch_cosponsor_for_each_bill(df_bills, limit=250):
     API_KEY = os.getenv('CONGRESS_API_KEY')
     BASE_URL = 'https://api.congress.gov/v3/bill/'
-    
+
     headers = {'X-API-Key': API_KEY}
     params = {'limit': limit}
 
-    all_cosponsors = []
-    
-    for index, row in tqdm(df_bills.iterrows(), desc='Fetching cosponsors', total=len(df_bills)):
+    cosponsors_list = []
+
+    for _, row in tqdm(df_bills.iterrows(), desc='Fetching cosponsors', total=len(df_bills)):
         bill_id = row['bill_id']
         congress = row['congress']
         bill_type = row['type']
         url = f"{BASE_URL}{congress}/{bill_type.lower()}/{bill_id}/cosponsors"
         response = requests.get(url, headers=headers, params=params)
-        
+
         if response.status_code == 200:
             data = response.json()
             cosponsors = data.get('cosponsors', [])
-            cosponsors_list = []
-
             for cosponsor in cosponsors:
                 cosponsor_info = {
-                    'bio_guide_id': cosponsor.get('bioguideId', 'N/A'),
+                    'bill_id': bill_id,
+                    'bioguide_id': cosponsor.get('bioguideId', 'N/A'),
                     'first_name': cosponsor.get('firstName', 'N/A'),
                     'last_name': cosponsor.get('lastName', 'N/A'),
                     'party': cosponsor.get('party', 'N/A'),
@@ -97,23 +97,27 @@ def fetch_cosponsor_for_each_bill(df_bills, limit=250):
                     'date_sponsored': cosponsor.get('sponsorshipDate', 'N/A')
                 }
                 cosponsors_list.append(cosponsor_info)
-            
-            df_bills['cosponsors'] = cosponsors_list
-        
         else:
-            print(f"Error: {response.status_code}")
-        quit()
-    return df_bills
+            print(f"Error fetching cosponsors for {bill_id}: {response.status_code}")
 
-# Fetch news from the last 3 months
-end_date = datetime.now()
-start_date = end_date - timedelta(days=90)
+    return pd.DataFrame(cosponsors_list)
 
-df_news = fetch_general_news_data('government', '2024-10-20', '2024-11-17')
-df_bills = pd.concat([fetch_recent_bills(117), fetch_recent_bills(118)], ignore_index=True)
+# Main script
+if __name__ == "__main__":
+    # Fetch news from the last 3 months
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=90)
+    df_news = fetch_general_news_data('government', '2024-10-31', '2024-11-17')
 
+    # Fetch recent bills from Congress 117 and 118
+    df_bills = pd.concat([fetch_recent_bills(117), fetch_recent_bills(118)], ignore_index=True)
 
-df_bills.to_csv('bills.csv', index=False)
-df_news.to_csv('government_news.csv', index=False)
-df_bills = fetch_cosponsor_for_each_bill(df_bills)
-df_bills.to_csv('bills_update.csv', index=False)
+    # Fetch cosponsors for each bill
+    df_cosponsors = fetch_cosponsor_for_each_bill(df_bills)
+
+    # Save data to CSV files
+    df_news.to_csv('government_news.csv', index=False)
+    df_bills.to_csv('bills.csv', index=False)
+    df_cosponsors.to_csv('cosponsors.csv', index=False)
+
+    print("Data saved successfully.")
