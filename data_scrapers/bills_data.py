@@ -46,8 +46,10 @@ def fetch_bills(congress_number, type, limit=250):
     # Process bills into structured data
     bill_list = []
     for bill in bills:
+        unique_bill_id = f"{bill.get('congress', 'N/A')}-{bill.get('type', 'N/A')}{bill.get('number', 'N/A')}"
+
         bill_info = {
-            'bill_id': bill.get('number', 'N/A'),
+            'bill_id': unique_bill_id,
             'title': bill.get('title', 'N/A'),
             'congress': bill.get('congress', 'N/A'),
             'type': bill.get('type', 'N/A'),
@@ -131,15 +133,15 @@ def fetch_cosponsor_for_bill(df_bills, limit=250):
 
     return pd.DataFrame(cosponsors_list)
 
-# Main script
+# Main script (For Test)
 if __name__ == "__main__":
     # Fetch news from the last 3 months
     # df_news = fetch_general_news_data('government', '2024-10-31', '2024-11-17')
-    df_members = fetch_congress_members(117)
+    df_members = fetch_congress_members(116)
     df_members.to_csv('member.csv', index=False)
-    quit()
-    # Fetch recent bills from Congress 117 and 118
-    df_bills = pd.concat([fetch_bills(117, 'HR'), fetch_bills(117, 'S')], ignore_index=True)
+
+    # Fetch recent bills
+    df_bills = pd.concat([fetch_bills(116, 'HR'), fetch_bills(116, 'S')], ignore_index=True)
     
     # Fetch cosponsors for each bill
     # df_cosponsors = fetch_cosponsor_for_each_bill(df_bills)
