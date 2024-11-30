@@ -14,8 +14,8 @@ def scrape_and_transform_transactions():
     df = pd.DataFrame(data)
 
     # Convert data categories  to datetime format
-    df['transaction_date'] = pd.to_datetime(df['transaction_date'], errors='coerce')
-    df['disclosure_date'] = pd.to_datetime(df['disclosure_date'], errors='coerce')
+    df['transaction_date'] = pd.to_datetime(df['transaction_date'], errors='coerce').dt.strftime('%Y-%m-%d')
+    df['disclosure_date'] = pd.to_datetime(df['disclosure_date'], errors='coerce').dt.strftime('%Y-%m-%d')
 
     return df
 
