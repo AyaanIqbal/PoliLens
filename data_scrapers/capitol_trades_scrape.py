@@ -1,40 +1,40 @@
 import requests
 from bs4 import BeautifulSoup
-from typing import List
-import re
 
-class poli_trade:
-    def __init__(self, politician: str, company: str, action: str, amount: str):
-        self.politician = politician
-        self.company = company
-        self.action = action
-        self.amount - amount
-
-    def __repr__(self):
-        return f"poli_trade(politician='{self.politician}', company='{self.company}', action='{self.action}', amount='{self.amount}')"
+def scrape_capitol_trades(max_pages):
+    # Base URL and initial setup
+    base_url = "https://www.capitoltrades.com/trades?pageSize=96&page={}"
+    trades = []
     
-    def scrape_capitol_trades() -> List[poli_trade]:
-        url = "https://www.capitoltrades.com/politicians"
+    # Iterate through the specified number of pages
+    for current_page in range(1, max_pages + 1):
+        print(f"Scraping page {current_page}...")
+        url = base_url.format(current_page)
         response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Handle failed requests
+        if response.status_code != 200:
+            print(f"Failed to fetch page {current_page}. Status code: {response.status_code}")
+            break
+        
+        soup = BeautifulSoup(response.text, "html.parser")
+        
+        # Extract trades from the current page
+        trade_rows = soup.select("tbody > tr")  # Select all <tr> directly under <tbody>
+        for row in trade_rows:
+            trade_data = []
+            cells = row.find_all("td")  # Locate all <td> cells in the row
+            for cell in cells:
+                trade_data.append(cell.text.strip())  # Extract and clean the text
+            trades.append(trade_data)
+    
+    print(f"Scraped {len(trades)} trades from {max_pages} pages.")
+    return trades
 
-        trades = []
-        trade_row = soup.select('.trade-row')
+# User input for number of pages to scrape
+max_pages = int(input("Enter the number of pages to scrape (each page contains 96 trades): "))
+scraped_trades = scrape_capitol_trades(max_pages)
 
-        for row in trade_row:
-            politician = row.select_one('.politician-name').text.strip()
-            company = row.select_one('.company_name').text.strip()
-            action = row.select_one('.trade-action').text.strip()
-            amount = row.select_one('.trade-amount').text.strip()
-
-            trade = poli_trade(politician, company, action, amount)
-            trades.append(trade)
-        return trades
-
-    def main():
-        capitol_trades = scrape_capitol_trades()
-        for trade in capitol_trades:
-            print(trade)
-
-    if __name__ == "__main__":
-        main()
+# Display scraped data
+for trade in scraped_trades:
+    print(trade)
