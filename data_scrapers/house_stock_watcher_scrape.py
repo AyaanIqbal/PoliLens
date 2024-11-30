@@ -17,9 +17,6 @@ def scrape_and_transform_transactions():
     df['transaction_date'] = pd.to_datetime(df['transaction_date'], errors='coerce')
     df['disclosure_date'] = pd.to_datetime(df['disclosure_date'], errors='coerce')
 
-    # Convert 'disclosure_year' to an integer, handling invalid entries
-    df['disclosure_year'] = pd.to_numeric(df['disclosure_year'], errors='coerce').fillna(0).astype(int)
-
     return df
 
 # Example usage
