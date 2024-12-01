@@ -1,31 +1,57 @@
-import pandas as pd
 import requests
+import os
+import pandas as pd
+from dotenv import load_dotenv
+from tqdm import tqdm
 
+load_dotenv()
+
+# Fetches recent trades reported by Congress members
 def scrape_and_transform_transactions():
-    # URL of the JSON data
-    url = "https://house-stock-watcher-data.s3-us-west-2.amazonaws.com/data/all_transactions.json"
+    BASE_URL = "https://house-stock-watcher-data.s3-us-west-2.amazonaws.com/data/all_transactions.json"
 
-    # Fetch the JSON data
-    response = requests.get(url)
-    response.raise_for_status() 
+    response = requests.get(BASE_URL)
+    if response.status_code != 200:
+        print(f"Error: {response.status_code}")
+        return pd.DataFrame()
 
-    # Load the data into a Pandas df
     data = response.json()
-    df = pd.DataFrame(data)
 
-    # Convert data categories  to datetime format
-    df['transaction_date'] = pd.to_datetime(df['transaction_date'], errors='coerce')
-    df['disclosure_date'] = pd.to_datetime(df['disclosure_date'], errors='coerce')
+    # Process transactions into structured data
+    trade_list = []
+    for trade in tqdm(data, desc="Processing trades"):
+        trade_info = {
+            'ticker': trade.get('ticker', 'N/A'),
+            'representative': trade.get('representative', 'N/A'),
+            'transaction_date': trade.get('transaction_date', 'N/A'),
+            'disclosure_date': trade.get('disclosure_date', 'N/A'),
+            'amount': trade.get('amount', 'N/A'),
+            'type': trade.get('type', 'N/A'),
+            'asset_type': trade.get('asset_type', 'N/A'),
+            'district': trade.get('district', 'N/A'),
+            'party': trade.get('party', 'N/A')
+        }
+        trade_list.append(trade_info)
+
+    # Convert to DataFrame and handle date columns
+    df = pd.DataFrame(trade_list)
+
+    def safe_to_datetime(val):
+        if isinstance(val, str):
+            try:
+                return pd.to_datetime(val, errors='raise')
+            except (ValueError, TypeError):
+                return val
+        return val
+
+    df['transaction_date'] = df['transaction_date'].apply(safe_to_datetime).where(df['transaction_date'].notna(), None)
+    df['disclosure_date'] = df['disclosure_date'].apply(safe_to_datetime).where(df['disclosure_date'].notna(), None)
 
     return df
 
-# Example usage
-transactions_df = scrape_and_transform_transactions()
-
-print(transactions_df.head())
-output_file = "house_stock_watcher.csv"
-
-# save data as a csv file 
-transactions_df.to_csv(output_file, index=False)
-print(f"Data saved to {output_file}")
-print(transactions_df.head())
+# Main script (For Test)
+if __name__ == "__main__":
+    # Scrape and transform transactions data
+    df_trades = scrape_and_transform_transactions()
+    df_trades.to_csv('trades.csv', index=False)
+    print("Trade data saved successfully.")
