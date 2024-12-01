@@ -17,6 +17,14 @@ def scrape_and_transform_transactions():
 
     data = response.json()
 
+    # Data mapping
+    sale_type = {
+        'exchange' : 'purchase', 
+        'purchase' : 'purchase', 
+        'sale_full' : 'sale_full',
+        'sale_partial' : 'sale_partial'
+    }
+
     # Process transactions into structured data
     trade_list = []
     for trade in tqdm(data, desc="Processing trades"):
@@ -26,8 +34,7 @@ def scrape_and_transform_transactions():
             'transaction_date': trade.get('transaction_date', 'N/A'),
             'disclosure_date': trade.get('disclosure_date', 'N/A'),
             'amount': trade.get('amount', 'N/A'),
-            'type': trade.get('type', 'N/A'),
-            'asset_type': trade.get('asset_type', 'N/A'),
+            'sale_type': sale_type.get(trade.get('type', 'N/A'), 'N/A'),
             'district': trade.get('district', 'N/A'),
             'party': trade.get('party', 'N/A')
         }

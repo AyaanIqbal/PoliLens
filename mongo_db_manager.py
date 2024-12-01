@@ -12,7 +12,7 @@ client = pymongo.MongoClient(os.getenv('MONGO_URI'))
 
 # Call scraping functions for trades and bills
 trade_df = td.scrape_and_transform_transactions()
-bill_df = bd.fetch_bills(116, 'HR')
+bill_df = pd.concat([bd.fetch_bills(116, 'HR'), bd.fetch_bills(116, 'S')], ignore_index=True)
 congress_df = bd.fetch_congress_members(116)
 
 # Specify database and collections
