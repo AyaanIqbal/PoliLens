@@ -1,12 +1,30 @@
 /* Import Bootstrap SCSS */
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+
+// Customize the spacing scale
+$spacers: (
+    0: 0,
+    1: 5px,
+    2: 10px,
+    3: 15px,
+    4: 20px,
+    5: 40px,
+);
+
 @import 'bootstrap/scss/bootstrap';
 
-$primary: #202427;
+$primary: #191D20;
+$secondary: #202427;
 $body-bg: #000;
 $body-color: #111;
 
 body {
     background-color: $body-bg;
+}
+
+footer {
+    background-color: $primary;
 }
 
 .btn-primary {
@@ -80,4 +98,38 @@ body {
     .navbar-collapse {
         justify-content: flex-end;
     }
+}
+
+.bills-page {
+    background-color: $primary;
+    color: #ffffff;
+    border-radius: 20px;
+  
+    .table-search {
+        background-color: transparent; // Darker background for search bar
+        border: 1px solid #fff;
+        border-radius: 20px;
+    
+        &::placeholder {
+            color: #fff;
+        }
+    }
+  
+    .custom-table {
+        border-color: transparent;
+
+        th {
+            background-color: transparent;
+            color: #ffffff;
+        }
+        td {
+            background-color: transparent;
+            border-radius: 10px;
+            color: #ffffff;
+        }
+        tr:hover {
+            background-color: $secondary;
+        }
+    }
+
 }
