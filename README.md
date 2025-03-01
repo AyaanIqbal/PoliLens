@@ -55,3 +55,4 @@ PoliLens consists of **three core modules** working together:
 ## Preview
 
 ## License
+This project is licensed under the MIT License. See the LICENSE file for details.
